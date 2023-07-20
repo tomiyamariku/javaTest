@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>入力フォーム</title>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+  <script>
+    function myFunction(event) {
+      event.preventDefault();
+      //idがmessageの要素の内容を取得
+      var message = document.getElementById("message").value;
+
+      //console.log(message);
+      if(message.length > 200){
+        var errorMessage = document.getElementById("error-message");
+      errorMessage.innerText = "200字以内で入力してください。";
+      };
+
+    }
+    </script>
+
+</head>
+<body>
+  <h1>入力フォーム</h1>
+  <p style="font-size: 18px;">不正な値を入力してください。</p>
+  <p>入力されたメッセージ: [(${submittedMessage})]<span th:text="${submittedMessage}"></span></p>
+
+  
+  
+  <form id="myForm" method="post" th:action="@{/submit}">
+    <label for="message">メッセージ:</label><br>
+    <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
+    <span id="error-message" style="color: red;"></span><br>
+    <!--input type="submit" value="送信" onclick="myFunction(event)"-->
+    <input type="submit" value="送信">
+  </form>
+
+  
+
+
+</body>
+</html>
