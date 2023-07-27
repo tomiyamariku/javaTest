@@ -6,6 +6,8 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -85,7 +87,7 @@ public class TodoController {
 
         //現在日付よりも前の日付で登録しようとしているかチェック
         if(LocalDate.parse(todo.getTime_limit()).compareTo(LocalDate.now())<0){
-
+JOptionPane.showMessageDialog(null, "エラーが発生しました。", "エラー", DATE_CNT, null);
         }
 
         todoMapper.add(todo);
