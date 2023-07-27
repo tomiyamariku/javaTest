@@ -25,4 +25,12 @@ public interface TodoMapper {
     public void delete();
 
     public void addInputTask(Todo todo);
+
+    public double selectUrgencyAvr();
+
+    public void deletePastDoneTask();
+
+    public void unDelete();
+
+    public void updateTitle();
 }

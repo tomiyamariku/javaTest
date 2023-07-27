@@ -8,21 +8,21 @@
   </select>
 
   <select id="selectIncomplete" resultType="com.todo.app.entity.Todo">
-    select * from todo_items where done_flg = 0
+    select * from todo_items where done_flg = 0 and del_flg = 0
   </select>
 
   <select id="selectComplete" resultType="com.todo.app.entity.Todo">
-    select * from todo_items where done_flg = 1
+    select * from todo_items where done_flg = 1 and del_flg = 0
   </select>
 
 <insert id="add"  useGeneratedKeys="true" keyProperty="id" parameterType="com.todo.app.entity.Todo">
-    insert into todo_items (title,time_limit)
-    values (#{title},to_date(#{time_limit},'yy-mm-dd'))
+    insert into todo_items (title,time_limit,urgency_level)
+    values (#{title},to_date(#{time_limit},'yy-mm-dd'),#{urgency_level})
   </insert>
 
 <insert id="addInputTask"  useGeneratedKeys="true" keyProperty="id" parameterType="com.todo.app.entity.Todo">
-    insert into todo_items (title,time_limit)
-    values (#{title},to_date(#{time_limit},'yy-mm-dd'))
+    insert into todo_items (title,time_limit,done_flg,urgency_level)
+    values (#{title},to_date(#{time_limit},'yy-mm-dd'),#{done_flg},#{urgency_level})
   </insert>
 
     <update id="update" parameterType="com.todo.app.entity.Todo">
@@ -34,7 +34,9 @@
     </update>
 
     <delete id="delete" parameterType="com.todo.app.entity.Todo">
-      delete from todo_items where done_flg = 1
+      update todo_items set
+      del_flg = 1
+      where done_flg = 1
     </delete>
 
   <select id="search" resultType="com.todo.app.entity.Todo">
@@ -52,4 +54,31 @@
     </where>
 
   </select>
+
+  <select id="selectUrgencyAvr" resultType="double">
+    select round(avg(urgency_level), 2) as 平均値
+    from todo_items
+    where done_flg = 0
+    and del_flg = 0
+  </select>
+
+  <delete id="deletePastDoneTask" parameterType="com.todo.app.entity.Todo">
+    update todo_items
+    set del_flg = 1
+    where done_flg = 1
+    and time_limit &lt; now()
+  </delete>
+
+  <update id="unDelete" parameterType="com.todo.app.entity.Todo">
+  update todo_items
+  set del_flg = 0
+  </update>
+
+  <update id="updateTitle" parameterType="com.todo.app.entity.Todo">
+  update todo_items
+  set title = title || '(10日以内)'
+  where (time_limit - now()) &lt;= INTERVAL '10 days'
+  and  (time_limit - now()) &gt; INTERVAL '0 days'
+  </update>
+
 </mapper>

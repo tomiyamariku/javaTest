@@ -9,7 +9,9 @@
 <title>TodoApp</title>
 </head>
 <body>
-  <h1>TodoList</h1>
+  <!--共通ヘッダ-->
+  <header th:replace="header.html :: header"></header>
+
   <h3 id="MyTask">マイタスク</h3>
   <h3>タスク条件</h3>
   <form id="formSub" method="post" th:action="@{/search}">
@@ -25,6 +27,7 @@
   <span class="button_Mytask_show" style="display:inline-block"></span>
   </div>
 
+  <!--メイン表示部-->
   <table class="table table-borderless" id="todos">
     <thead>
     </thead>
@@ -36,12 +39,21 @@
         </td>
         <td  style="width:22rem"><input type="text" style="border:none;width:22rem" name="title" th:value="${todo.title}"/></td>
         <!--td><input type="date" style="border:none" name="time_limit" th:value="${todo.time_limit}" /></td-->
-        <td><span th:text="${todo.time_limit}" ></span></td>
+        <td><span th:text="${todo.time_limit}" name="time_limit"></span></td>
+        <td>緊急度：<span th:text="${todo.urgency_level}" name="urgency_level"></span></td>
         <td><input type="text"style="border:none" name="date_flg" th:value="${todo.date_flg}" /></td>
       </tr>
     </tbody>
   </table>
 
+  <div style="font-size:20px">
+
+<div>
+<label>平均緊急度:<span th:text="${urgencyLevel}" name="urgency_level"></span></label>
+</div>
+
+
+  <!--完了タスク表示部-->
   <div style="font-size:20px">
     <span id="done_count"></span>
     <span class="pr-3">件完了</span>
@@ -64,6 +76,7 @@
   </table>
 
 
+  <!--ポップアップのタスク追加画面-->
    <button type="button" class="btn btn-light rounded-circle p-0 text-muted font-weight-bold" data-toggle="modal"data-target="#modal"
     style="width:2.5rem;height:2.5rem;">＋</button>
    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
@@ -77,6 +90,24 @@
                        <div class="form-group">
                            <input type="date" name="time_limit"class="form-control" style="width:60%;" />
                        </div>
+                       <div class="form-group">
+                        <div class="form-check form-check-inline">
+                          <input type="radio" name="urgency_level" class="form-check-input" value="1" id="urgency1" checked />
+                          <label class="form-check-label" for="urgency1">1</label><br>
+
+                          <input type="radio" name="urgency_level" class="form-check-input" value="2" id="urgency2" />
+                          <label class="form-check-label" for="urgency2">2</label>
+
+                          <input type="radio" name="urgency_level" class="form-check-input" value="3" id="urgency3" />
+                          <label class="form-check-label" for="urgency3">3</label>
+
+                          <input type="radio" name="urgency_level" class="form-check-input" value="4" id="urgency4" />
+                          <label class="form-check-label" for="urgency4">4</label>
+
+                          <input type="radio" name="urgency_level" class="form-check-input" value="5" id="urgency5" />
+                          <label class="form-check-label" for="urgency5">5</label>
+                        </div>
+                      </div>
                        <div class="text-right">
                          <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">キャンセル</button>
                          <button type="button" class="btn btn-primary" data-dismiss="modal" id="add">追加</button>

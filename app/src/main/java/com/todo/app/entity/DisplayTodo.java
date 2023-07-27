@@ -10,4 +10,5 @@ public class DisplayTodo extends Todo {
     public void setDate_flg(String date_flg) {
         this.date_flg = date_flg;
     }
+
 }

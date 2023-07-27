@@ -57,7 +57,13 @@ $(function(){
             const clone = $('#todes tr:first').clone(true);
             clone.find('input[name="id"]').val(json.id);
             clone.find('input[name="title"]').val(json.title);
-            clone.find('input[name="time_limit"]').val(json.time_limit);
+            clone.find('span[name="time_limit"]').text(json.time_limit);
+            clone.find('span[name="urgency_level"]').text(json.urgency_level);
+
+            console.log(json.time_limit);
+            console.log(json.urgency_level);
+            // const selectedUrgencyLevel = json.urgency_level;
+            // clone.find('input[name="urgency_level"]').filter('[value="' + selectedUrgencyLevel + '"]').prop('checked', true);
             $('#todes').append(clone[0]);
         })
     })

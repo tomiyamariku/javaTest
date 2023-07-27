@@ -6,8 +6,6 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,20 +16,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.todo.app.entity.DisplayTodo;
+import com.todo.app.entity.Message;
 import com.todo.app.entity.Todo;
 import com.todo.app.mapper.TodoMapper;
-
+import com.todo.app.utility.CheckUtility;
 
 
 @Controller
 public class TodoController {
-
-    //日付取得用の桁数
-    private static final int DATE_CNT = 9;
-
-    private static final int NEXT_CNT = 1;
-
-
 
     @Autowired
     TodoMapper todoMapper;
@@ -39,8 +31,9 @@ public class TodoController {
     @RequestMapping(value="/")
     public String index(Model model) {
 
-        // List<Todo> list = todoMapper.selectAll();
+        int defaultNum = 0;
         
+        //未完了のタスク取得
         List<Todo> lists = todoMapper.selectIncomplete();
         List<DisplayTodo> displayTodoList = new ArrayList<>();
         for (Todo list:lists){
@@ -50,6 +43,7 @@ public class TodoController {
             displayTodo.setTitle(list.getTitle());
             displayTodo.setDone_flg(list.getDone_flg());
             displayTodo.setTime_limit(LocalDate.parse(list.getTime_limit()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            displayTodo.setUrgency_level(list.getUrgency_level());
             System.out.println(displayTodo.getTime_limit());
 
                 if(LocalDate.parse(displayTodo.getTime_limit()).compareTo(LocalDate.now())<0 ){
@@ -58,11 +52,20 @@ public class TodoController {
             displayTodoList.add(displayTodo);
         }
 
-
+        //完了済みタスク取得
         List<Todo> doneList = todoMapper.selectComplete();
+
+        //取得データ表示
         model.addAttribute("todos",displayTodoList);
         model.addAttribute("doneTodos",doneList);
-        System.out.println("///");
+
+        //未完了のタスクが存在するか判断
+        if(lists.size()>0){
+        double urgencyLevel = todoMapper.selectUrgencyAvr();
+        model.addAttribute("urgencyLevel",urgencyLevel);
+        } else {
+        model.addAttribute("urgencyLevel",defaultNum);
+        }
 
         return "index";
     }
@@ -80,19 +83,11 @@ public class TodoController {
         return "index";
     }
 
-
     @RequestMapping(value="/add")
     @ResponseBody
     public Todo add(Todo todo) {
-
-        //現在日付よりも前の日付で登録しようとしているかチェック
-        if(LocalDate.parse(todo.getTime_limit()).compareTo(LocalDate.now())<0){
-JOptionPane.showMessageDialog(null, "エラーが発生しました。", "エラー", DATE_CNT, null);
-        }
-
         todoMapper.add(todo);
         return todo;
-
     }
 
         @RequestMapping(value="/update")
@@ -137,60 +132,66 @@ JOptionPane.showMessageDialog(null, "エラーが発生しました。", "エラ
         return "index";
     }
 
-    
     @PostMapping("/submit")
     public String submitForm(@RequestParam("message") String message, Model model,Model model2) {
-        // フォームの送信処理を記述
-        // 受け取ったメッセージを処理するなどの処理を行うことができます
 
-        // System.out.println(message);
-        // model.addAttribute("AISATSU", "Hello World");
+        //入力された内容をカンマで分割し、Messageオブジェクトの各フィールドに値をセット
+        String[] items = message.split(",");
 
+        Message msg = new Message();
+        msg.setTitle(items[0]);
+        msg.setTime_limit(items[1]);
+        msg.setDone_flg(0); //初期登録は、未完了状態で登録する
+
+        //緊急度の数値チェック
+        if(CheckUtility.isNumeric(items[2])){
+        msg.setUrgency_level(Double.parseDouble(items[2]));
+        } else {
+        model.addAttribute("submittedMessage", "緊急度は数値で入力してください。");
+        return "index2"; // 処理終了
+        }
         
+        //カンマを除いた文字数をカウント
+        int strCnt = message.replace(",", "").length();
 
-        //入力値が、タスク管理の登録内容を書いたものか判断する
-        //System.out.println(message.substring(0,6));
-        //if(message.substring(0,6).equals("タスク管理,")){
-        int tasklength = message.indexOf(",");
-
-        if(tasklength > 1 && tasklength<=200){
-            //日付型に変換できるか判断する
+        //カンマを除いた文字数が1字以上かつ、200字未満の場合
+        if(strCnt > 1 && strCnt<200){
+            //日付型に変換できるか判断
             try{
-                //System.out.println("日付型に変換可能");
                 DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
                 DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                System.out.println(message.substring(tasklength + NEXT_CNT,tasklength + DATE_CNT));
-                LocalDate inputDate = LocalDate.parse(message.substring(tasklength + NEXT_CNT,tasklength + DATE_CNT),inputFormatter);
+
+                //日付表示形式変換
+                LocalDate inputDate = LocalDate.parse(msg.getTime_limit(),inputFormatter);
                 String FormattedDate = inputDate.format(outputFormatter);
                 
-                //動作確認用
-                //LocalDate outputDate = LocalDate.parse(FormattedDate,outputFormatter);
-                //System.out.println(outputDate.format(outputFormatter));
+                //登録処理
+                Todo todo = new Todo();
+                todo.setTitle(msg.getTitle());
+                todo.setTime_limit(FormattedDate);
+                todo.setDone_flg(0);
+                todo.setUrgency_level(msg.getUrgency_level());
 
-                        Todo todo = new Todo();
-                        todo.setTitle(message.substring(0,5));
-                        //System.out.println(message.substring(0,5));
-
-                        todo.setTime_limit(FormattedDate);
-                        //System.out.println(FormattedDate);
+                //実行
                 todoMapper.addInputTask(todo);
+                
                 } catch (DateTimeParseException e){
-                                //System.out.println("日付に変換不可");
+                System.out.println("日付に変換不可");
                 }
 
-        }
-
+        } else {
         model.addAttribute("submittedMessage", "入力形式が不正です");
+        }
+            return "index2"; // リダイレクトして同じ画面を更新
+}
 
-
-        return "index2"; // リダイレクトして同じ画面を更新
-    }
-
+    //強制終了
     @GetMapping("/exit")
     public String exitApplication(){
         System.exit(0);
-
         return "exit";
     }
+    
 }
+
 
