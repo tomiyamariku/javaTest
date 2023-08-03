@@ -8,8 +8,6 @@ import com.todo.app.entity.Todo;
 
 @Mapper
 public interface TodoMapper {
-
-
     public List<Todo> selectAll();
 
     public List<Todo> selectIncomplete();
@@ -33,4 +31,6 @@ public interface TodoMapper {
     public void unDelete();
 
     public void updateTitle();
+
+    public String selectFilePath();
 }

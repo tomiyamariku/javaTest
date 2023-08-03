@@ -7,6 +7,8 @@ private long id;
     private int done_flg;
     private String time_limit;
     private double urgency_level;
+    private int del_flg;
+    private String status;
     
     public long getId() {
         return id;
@@ -44,7 +46,23 @@ private long id;
     return urgency_level;
     }
 
-        public void setUrgency_level(double urgency_level) {
+    public void setUrgency_level(double urgency_level) {
         this.urgency_level = urgency_level;
+    }
+
+    public int getDel_Flg() {
+        return del_flg;
+    }
+
+    public void setDel_flg(int del_flg) {
+        this.del_flg = del_flg;
+    }
+
+    public String getStatus() {
+    return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

@@ -130,4 +130,10 @@ $(function(){
       }
   })
 
+      //非表示処理
+      $('#bat').click(function(){
+        $.post("/bat").done(function(){
+      })
+            })
+
     })

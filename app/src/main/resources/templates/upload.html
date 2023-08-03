@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>画像アップロード</title>
+      <!--共通ヘッダ-->
+  <header th:replace="header.html :: header"></header>
+</head>
+<body>
+    <h2>画像をアップロードしてください</h2>
+    <form th:action="@{/upload}" th:object="${imageForm}" method="post" enctype="multipart/form-data">
+        <input type="file" th:field="*{imageFile}" />
+        <input type="submit" value="アップロード" />
+        <br>
+        <label>ファイル名：<input type="text" name="fileName" /></label>
+    </form>
+</body>
+</html>

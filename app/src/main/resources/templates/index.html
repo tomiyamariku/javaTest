@@ -42,6 +42,7 @@
         <td><span th:text="${todo.time_limit}" name="time_limit"></span></td>
         <td>緊急度：<span th:text="${todo.urgency_level}" name="urgency_level"></span></td>
         <td><input type="text"style="border:none" name="date_flg" th:value="${todo.date_flg}" /></td>
+        <td>状況：<span th:text="${todo.status}" name="status"></span></td>
       </tr>
     </tbody>
   </table>
@@ -125,6 +126,8 @@
   </form>
   
   <button type="button" onclick="location.href='/exit'">アプリを終了する</button>
+<br>
+  <button type="button" onclick="location.href='/upload'">画像アップ画面に移動する</button>
 
   <script type="text/javascript" th:src="@{/js/todo.js}"></script>
 </body>
