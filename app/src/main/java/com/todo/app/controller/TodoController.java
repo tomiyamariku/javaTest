@@ -316,7 +316,14 @@ public class TodoController {
         //保存する画像ファイルの名称
         String fileName = InputFileName;
         //拡張子
-        String fileExtension = imageFile.getOriginalFilename().substring(fileName.lastIndexOf("."),fileName.length());
+        String fileExtension = imageForm.getImageFile().getOriginalFilename();
+        if (!imageFile.isEmpty()) {
+            fileExtension = fileExtension.substring(fileExtension.lastIndexOf("."),fileExtension.length());
+        } else {
+            return "upload";
+        }
+
+
         //保存先絶対パス
         String savePath = todoMapper.selectFilePath() + "/" + fileName + fileExtension;
 
@@ -346,7 +353,7 @@ public class TodoController {
 
             //ディレクトリ内のファイルに重複するものがないかチェック
             if (directory.isDirectory()){
-                if(CheckUtility.checkDupulicates(directory, fileNames,fileName)){
+                if(CheckUtility.checkDupulicates(directory, fileNames,fileName + fileExtension)){
 
                 } else {
                 //重複ありの場合は、処理を終了する。
